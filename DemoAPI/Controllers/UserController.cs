@@ -34,11 +34,21 @@ namespace DemoAPI.Controllers
          {
             return BadRequest(user);
          }
-         if (_userRepository.Register(user.Email, user.Password, user.Username))
+         try
          {
-            return Ok("Utilisateur enregistré");
+            if (_userRepository.Register(user.Email, user.Password, user.Username))
+            {
+               return Ok("Utilisateur enregistré");
+            }
+            return Ok();
+         }
+         catch (Exception ex)
+         {
+
+            BadRequest(ex.Message);
          }
          return Ok();
+
       }
 
       [HttpPost("Login")]
