@@ -14,8 +14,6 @@ namespace DemoASP.Models.ViewModel
       [DataType(DataType.Password)]
       [RegularExpression("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$")]
       public string Password { get; set; }
-      [DataType(DataType.Password)]
-      [Compare(nameof(Password), ErrorMessage = "Les 2 mots de passe doivent correspondre")]
-      public string ConfirmPassword { get; set; }
+
    }
 }

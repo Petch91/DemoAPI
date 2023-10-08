@@ -3,6 +3,7 @@ using DAL.Interfaces;
 using DAL.Models;
 using DemoAPI.Tools;
 using DemoASP.Models.ViewModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,21 +14,25 @@ namespace DemoAPI.Controllers
    public class UserController : ControllerBase
    {
       private readonly IUserRepository _userRepository;
-      public UserController(IUserRepository userRepository)
+      private readonly TokenManager _tokenManager;
+      public UserController(IUserRepository userRepository,TokenManager tokenManager)
       {
          _userRepository = userRepository;
+         _tokenManager = tokenManager;
       }
+      [Authorize("AdminPolicy")]
       [HttpGet]
       public IActionResult GetAll() 
       {
          return Ok(_userRepository.ReadAll().Select(u => u.ToUserView()));
       }
+      [Authorize("IsConnected")]
       [HttpGet("{id}")]
       public IActionResult GetById([FromRoute]Guid id) 
       {
-         return Ok(_userRepository.ReadOne(id).ToUserView);
+         return Ok(_userRepository.ReadOne(id).ToUserView());
       }
-      [HttpPost("Register")]
+      [HttpPost("register")]
       public IActionResult Register(UserRegisterForm user)
       {
          if (!ModelState.IsValid)
@@ -38,7 +43,7 @@ namespace DemoAPI.Controllers
          {
             if (_userRepository.Register(user.Email, user.Password, user.Username))
             {
-               return Ok("Utilisateur enregistré");
+               return Ok(user);
             }
             return Ok();
          }
@@ -51,7 +56,7 @@ namespace DemoAPI.Controllers
 
       }
 
-      [HttpPost("Login")]
+      [HttpPost("login")]
       public IActionResult Login(UserLoginForm user)
       {
          if (!ModelState.IsValid)
@@ -61,19 +66,14 @@ namespace DemoAPI.Controllers
          try
          {
             User u = _userRepository.Login(user.Email, user.Password);
-            //_session.ConnectedUser = u;
-            return Ok($"{u.UserName} est bien connecté");
+            u.Token = _tokenManager.GenerateToken(u);
+            return Ok(u);
          }
          catch (Exception ex)
          {
             return BadRequest(ex.Message);
          }
       }
-      //[HttpGet("Logout")]
-      //public IActionResult Logout() 
-      //{
-      //   _session.Logout();
-      //   return Ok();
-      //}
+
    }
 }

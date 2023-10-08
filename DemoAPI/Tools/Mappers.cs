@@ -9,7 +9,12 @@ namespace DemoAPI.Tools
    {
       public static Game ToGame(this GameForm game)
       {
-         return new Game { Title = game.Title, DateDeSortie = game.DateDeSortie, Genres = new Genre { Id = game.IdGenre}, Resume = game.Resume };
+         return new Game { Title = game.Title, DateDeSortie = DateTime.Now, Genres = new Genre { Id = game.IdGenre}, Resume = game.Resume };
+      }
+
+      public static GameForm ToGameForm(this Game game)
+      {
+         return new GameForm { Title = game.Title, IdGenre = game.Genres.Id, Resume = game.Resume };
       }
 
       public static Genre ToGenre(this GenreForm genre) 

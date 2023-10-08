@@ -2,6 +2,7 @@
 using DAL.Models;
 using DemoAPI.Models;
 using DemoAPI.Tools;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,6 +27,7 @@ namespace DemoAPI.Controllers
       {
          return Ok(_gameRepository.ReadOne(id));
       }
+      [Authorize("AdminPolicy")]
       [HttpPost("add")]
       public IActionResult Add([FromBody] GameForm game)
       {
@@ -33,14 +35,18 @@ namespace DemoAPI.Controllers
          {
             return BadRequest();
          }
-         _gameRepository.Create(game.ToGame());
+         return Ok(_gameRepository.Create(game.ToGame()));
+      }
+      [HttpPatch("edit/{id}")]
+      public IActionResult Edit([FromBody] GameForm game, [FromRoute] int id)
+      {
+         if (!ModelState.IsValid)
+         {
+            return BadRequest();
+         }
+         _gameRepository.Update(game.ToGame());
          return Ok();
       }
-      //[HttpPost("edit/{id}")]
-      //public IActionResult Edit([FromRoute] int id) 
-      //{
-      //   GetById(id);
-      //}
       [HttpDelete("{id}")]
       public IActionResult Delete(int id)
       {
@@ -52,6 +58,7 @@ namespace DemoAPI.Controllers
       {
          return Ok(_gameRepository.GamesByGenre());
       }
+      [Authorize("IsConnected")]
       [HttpGet("Favoris/{id}")]
       public IActionResult GetFav([FromRoute] Guid id)
       {
