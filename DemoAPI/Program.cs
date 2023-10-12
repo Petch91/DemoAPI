@@ -1,5 +1,7 @@
 using DAL;
+using DAL.Domains;
 using DAL.Interfaces;
+using DAL.Services;
 using DemoAPI.Tools;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -15,11 +17,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddTransient<SqlConnection>(pc => new SqlConnection(builder.Configuration.GetConnectionString("home")));
+builder.Services.AddTransient<DataContext>();
 
-builder.Services.AddScoped<IGameRepository,GameRepository>();
-builder.Services.AddScoped<IGenreRepository,GenreRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IGameService,GameService>();
+builder.Services.AddScoped<IGenreService,GenreService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<TokenManager>();
 
 //Ajout de la sécurité par JWT

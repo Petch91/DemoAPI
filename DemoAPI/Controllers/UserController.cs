@@ -1,6 +1,7 @@
 ﻿using DAL;
 using DAL.Interfaces;
-using DAL.Models;
+
+using DemoAPI.Models;
 using DemoAPI.Tools;
 using DemoASP.Models.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -13,24 +14,24 @@ namespace DemoAPI.Controllers
    [ApiController]
    public class UserController : ControllerBase
    {
-      private readonly IUserRepository _userRepository;
+      private readonly IUserService _UserService;
       private readonly TokenManager _tokenManager;
-      public UserController(IUserRepository userRepository,TokenManager tokenManager)
+      public UserController(IUserService UserService,TokenManager tokenManager)
       {
-         _userRepository = userRepository;
+         _UserService = UserService;
          _tokenManager = tokenManager;
       }
       [Authorize("AdminPolicy")]
       [HttpGet]
       public IActionResult GetAll() 
       {
-         return Ok(_userRepository.ReadAll().Select(u => u.ToUserView()));
+         return Ok(_UserService.ReadAll().Select(u => u.ToUserView()));
       }
       [Authorize("IsConnected")]
       [HttpGet("{id}")]
-      public IActionResult GetById([FromRoute]Guid id) 
+      public IActionResult GetById([FromRoute]int id) 
       {
-         return Ok(_userRepository.ReadOne(id).ToUserView());
+         return Ok(_UserService.ReadOne(id).ToUserView());
       }
       [HttpPost("register")]
       public IActionResult Register(UserRegisterForm user)
@@ -41,7 +42,7 @@ namespace DemoAPI.Controllers
          }
          try
          {
-            if (_userRepository.Register(user.Email, user.Password, user.Username))
+            if (_UserService.Register(user.Email, user.Password, user.Username))
             {
                return Ok(user);
             }
@@ -65,7 +66,7 @@ namespace DemoAPI.Controllers
          }
          try
          {
-            User u = _userRepository.Login(user.Email, user.Password);
+            User u = _UserService.Login(user.Email, user.Password).ToAPI();
             u.Token = _tokenManager.GenerateToken(u);
             return Ok(u);
          }

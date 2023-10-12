@@ -1,4 +1,4 @@
-﻿using DAL.Models;
+﻿
 using System.ComponentModel.DataAnnotations;
 
 namespace DemoAPI.Models
@@ -9,7 +9,7 @@ namespace DemoAPI.Models
       public string Title { get; set; }
       [Required]
       [Range(1, int.MaxValue)]
-      public int IdGenre { get; set; }
+      public int GenreId { get; set; }
       public string? Resume { get; set; }
    }
 }

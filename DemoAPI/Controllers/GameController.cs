@@ -1,5 +1,4 @@
 ﻿using DAL.Interfaces;
-using DAL.Models;
 using DemoAPI.Models;
 using DemoAPI.Tools;
 using Microsoft.AspNetCore.Authorization;
@@ -12,20 +11,20 @@ namespace DemoAPI.Controllers
    [ApiController]
    public class GameController : ControllerBase
    {
-      private readonly IGameRepository _gameRepository;
-      public GameController(IGameRepository gameRepository)
+      private readonly IGameService _gameService;
+      public GameController(IGameService gameService)
       {
-         _gameRepository = gameRepository;
+         _gameService = gameService;
       }
       [HttpGet]
       public IActionResult GetAll()
       {
-         return Ok(_gameRepository.ReadAll());
+         return Ok(_gameService.ReadAll());
       }
       [HttpGet("{id}")]
       public IActionResult GetById(int id)
       {
-         return Ok(_gameRepository.ReadOne(id));
+         return Ok(_gameService.ReadOne(id));
       }
       [Authorize("AdminPolicy")]
       [HttpPost("add")]
@@ -35,7 +34,8 @@ namespace DemoAPI.Controllers
          {
             return BadRequest();
          }
-         return Ok(_gameRepository.Create(game.ToGame()));
+         _gameService.Create(game.ToGame());
+         return Ok();
       }
       [HttpPatch("edit/{id}")]
       public IActionResult Edit([FromBody] GameForm game, [FromRoute] int id)
@@ -44,39 +44,39 @@ namespace DemoAPI.Controllers
          {
             return BadRequest();
          }
-         _gameRepository.Update(game.ToGame());
+         _gameService.Update(game.ToGame());
          return Ok();
       }
       [HttpDelete("{id}")]
       public IActionResult Delete(int id)
       {
-         if (_gameRepository.Delete(id)) return Ok();
+         if (_gameService.Delete(id)) return Ok();
          return BadRequest();
       }
-      [HttpGet("byGenre")]
-      public IActionResult GetByGenre()
-      {
-         return Ok(_gameRepository.GamesByGenre());
-      }
+      //[HttpGet("byGenre")]
+      //public IActionResult GetByGenre()
+      //{
+      //   return Ok(_gameService.GamesByGenre());
+      //}
       [Authorize("IsConnected")]
-      [HttpGet("Favoris/{id}")]
-      public IActionResult GetFav([FromRoute] Guid id)
+      [HttpGet("Favoris/{userId}")]
+      public IActionResult GetFav([FromRoute] int userId)
       {
-         return Ok(_gameRepository.GetFavGames(id));
+         return Ok(_gameService.GetFavGames(userId));
 
       }
-      [HttpPost("addFavori/{id}/user/{guid}")]
-      public IActionResult AddFavori([FromRoute] int id, [FromRoute] Guid guid)
+      [HttpPost("addFavori/{gameId}/user/{userId}")]
+      public IActionResult AddFavori([FromRoute] int gameId, [FromRoute] int userId)
       {
-         if (_gameRepository.ReadAll().Where(g => g.Id == id).Count() == 0)
+         if (_gameService.ReadAll().Where(g => g.GameId == gameId).Count() == 0)
          {
             return BadRequest("ce jeu n'existe pas");
          }
-         if(_gameRepository.GetFavGames(guid).Where(g => g.Id == id).Count() != 0)
+         if(_gameService.GetFavGames(userId).Where(g => g.GameId == gameId).Count() != 0)
          {
-            return BadRequest($"{_gameRepository.ReadOne(id).Title} est déjà dans les favoris");
+            return BadRequest($"{_gameService.ReadOne(gameId).Title} est déjà dans les favoris");
          }
-         _gameRepository.AddGameToFavList(guid, id);
+         _gameService.AddGameToFavList(userId, gameId);
          return Ok();
          
       }

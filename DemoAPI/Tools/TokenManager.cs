@@ -1,4 +1,5 @@
-﻿using DAL.Models;
+﻿
+using DemoAPI.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -23,7 +24,7 @@ namespace DemoAPI.Tools
          //2. Données concernant le token et l'utilisateur
          Claim[] claims = new Claim[]
          {
-                new Claim(ClaimTypes.Sid, user.Id.ToString()),
+                new Claim(ClaimTypes.Sid, user.UserId.ToString()),
                 new Claim(ClaimTypes.Role, user.RoleId == 1 ? "User" : "Admin")
 
          };

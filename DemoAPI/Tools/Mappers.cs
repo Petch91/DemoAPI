@@ -1,4 +1,5 @@
-﻿using DAL.Models;
+﻿using DAL.Entities.Enums;
+using DAL.Entities;
 using DemoAPI.Models;
 using DemoASP.Models.ViewModel;
 using System.Runtime.CompilerServices;
@@ -9,21 +10,25 @@ namespace DemoAPI.Tools
    {
       public static Game ToGame(this GameForm game)
       {
-         return new Game { Title = game.Title, DateDeSortie = DateTime.Now, Genres = new Genre { Id = game.IdGenre}, Resume = game.Resume };
+         return new Game { Title = game.Title, GenreId = game.GenreId, Resume = game.Resume };
       }
 
       public static GameForm ToGameForm(this Game game)
       {
-         return new GameForm { Title = game.Title, IdGenre = game.Genres.Id, Resume = game.Resume };
+         return new GameForm { Title = game.Title, Resume = game.Resume };
       }
 
       public static Genre ToGenre(this GenreForm genre) 
       {
          return new Genre { Label = genre.Label };
       }
-      public static UserView ToUserView(this User user)
+      public static UserView ToUserView(this DAL.Entities.User user)
       {
-         return new UserView { Id = user.Id, Role = user.Role, UserName = user.UserName };
+         return new UserView { UserId = user.UserId, Role = (Role)user.RoleId, UserName = user.UserName };
+      }
+      public static DemoAPI.Models.User ToAPI(this DAL.Entities.User user)
+      {
+         return new DemoAPI.Models.User { Email = user.Email, UserId = user.UserId, UserName = user.UserName, RoleId = user.RoleId };
       }
    }
 }

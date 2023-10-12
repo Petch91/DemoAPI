@@ -11,16 +11,16 @@ namespace DemoAPI.Controllers
    [ApiController]
    public class GenreController : ControllerBase
    {
-      private readonly IGenreRepository _genreRepository;
-      public GenreController(IGenreRepository genreRepository)
+      private readonly IGenreService _genreService;
+      public GenreController(IGenreService genreService)
       {
-         _genreRepository = genreRepository;
+         _genreService = genreService;
       }
 
       [HttpGet]
       public IActionResult GetAll() 
       {
-         return Ok(_genreRepository.ReadAll());
+         return Ok(_genreService.ReadAll());
       }
       [HttpPost("add")]
       public IActionResult Add([FromBody] GenreForm genre)
@@ -29,13 +29,13 @@ namespace DemoAPI.Controllers
          {
             return BadRequest();
          }
-         _genreRepository.Create(genre.ToGenre());
+         _genreService.Create(genre.ToGenre());
          return Ok();
       }
       [HttpDelete("{id}")]
       public IActionResult Delete(int id)
       {
-         if (_genreRepository.Delete(id)) return Ok();
+         if (_genreService.Delete(id)) return Ok();
          return BadRequest();
       }
    }
